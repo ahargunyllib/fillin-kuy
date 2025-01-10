@@ -10,10 +10,14 @@ import {
 	NavigationMenuTrigger,
 } from "@/shared/components/ui/navigation-menu";
 import { Menu, MoveRight, X } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+import { Skeleton } from "./ui/skeleton";
 
 export const Header = () => {
+	const { status } = useSession();
+
 	const navigationItems = [
 		{
 			title: "Home",
@@ -128,7 +132,31 @@ export const Header = () => {
 						Book a demo
 					</Button>
 					<div className="border-r hidden md:inline" />
-					<Button variant="outline">Sign in</Button>
+					{status === "authenticated" ? (
+						<Button
+							variant="ghost"
+							onClick={() =>
+								signOut({
+									callbackUrl: "/",
+								})
+							}
+						>
+							Logout
+						</Button>
+					) : status === "unauthenticated" ? (
+						<Button
+							variant="ghost"
+							onClick={() =>
+								signIn("google", {
+									callbackUrl: "/",
+								})
+							}
+						>
+							Login
+						</Button>
+					) : (
+						<Skeleton className="w-20 h-10" />
+					)}
 					<Button>Get started</Button>
 				</div>
 				<div className="flex w-12 shrink lg:hidden items-end justify-end">
