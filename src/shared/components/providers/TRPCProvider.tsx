@@ -1,3 +1,5 @@
+"use client";
+
 import { TRPCReactProvider } from "@/trpc/react";
 
 export default function TRPCProvider({
