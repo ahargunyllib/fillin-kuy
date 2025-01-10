@@ -4,7 +4,10 @@
  */
 import "./src/env.js";
 
-/** @type {import("next").NextConfig} */
-const config = {};
+import type { NextConfig } from "next";
 
-export default config;
+const nextConfig: NextConfig = {
+	/* config options here */
+};
+
+export default nextConfig;
