@@ -1,7 +1,11 @@
 import { relations, sql } from "drizzle-orm";
 import {
+	type PgTableExtraConfig,
+	boolean,
+	check,
 	index,
 	integer,
+	pgEnum,
 	pgTableCreator,
 	primaryKey,
 	text,
@@ -18,28 +22,7 @@ import type { AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `fillin-kuy_${name}`);
 
-export const posts = createTable(
-	"post",
-	{
-		id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-		name: varchar("name", { length: 256 }),
-		createdById: varchar("created_by", { length: 255 })
-			.notNull()
-			.references(() => users.id),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.default(sql`CURRENT_TIMESTAMP`)
-			.notNull(),
-		updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-			() => new Date(),
-		),
-	},
-	(example) => ({
-		createdByIdIdx: index("created_by_idx").on(example.createdById),
-		nameIndex: index("name_idx").on(example.name),
-	}),
-);
-
-export const users = createTable("user", {
+export const users = createTable("users", {
 	id: varchar("id", { length: 255 })
 		.notNull()
 		.primaryKey()
@@ -58,7 +41,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const accounts = createTable(
-	"account",
+	"accounts",
 	{
 		userId: varchar("user_id", { length: 255 })
 			.notNull()
@@ -91,7 +74,7 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 }));
 
 export const sessions = createTable(
-	"session",
+	"sessions",
 	{
 		sessionToken: varchar("session_token", { length: 255 })
 			.notNull()
@@ -114,7 +97,7 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 export const verificationTokens = createTable(
-	"verification_token",
+	"verification_tokens",
 	{
 		identifier: varchar("identifier", { length: 255 }).notNull(),
 		token: varchar("token", { length: 255 }).notNull(),
@@ -127,3 +110,164 @@ export const verificationTokens = createTable(
 		compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
 	}),
 );
+
+export const forms = createTable("forms", {
+	id: varchar("id", { length: 255 })
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	ownerId: varchar("owner_id", { length: 255 })
+		.notNull()
+		.references(() => users.id),
+	title: varchar("title", { length: 255 }),
+	description: text("description"),
+	createdAt: timestamp("created_at", {
+		mode: "date",
+		withTimezone: true,
+	}).default(sql`CURRENT_TIMESTAMP`),
+	updatedAt: timestamp("updated_at", {
+		mode: "date",
+		withTimezone: true,
+	}).default(sql`CURRENT_TIMESTAMP`),
+	closedAt: timestamp("closed_at", {
+		mode: "date",
+		withTimezone: true,
+	}),
+});
+
+export const formsRelations = relations(forms, ({ one }) => ({
+	owner: one(users, { fields: [forms.ownerId], references: [users.id] }),
+}));
+
+export const fieldTypeEnum = pgEnum("field_type_enum", [
+	"text",
+	"textarea",
+	"select",
+	"checkbox",
+	"radio",
+	"date",
+	"time",
+	"datetime",
+	"file",
+	"number",
+	"email",
+	"url",
+]);
+
+export const fields = createTable("fields", {
+	id: varchar("id", { length: 255 })
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	formId: varchar("form_id", { length: 255 })
+		.notNull()
+		.references(() => forms.id, {
+			onDelete: "cascade",
+		}),
+	name: varchar("name", { length: 255 }).notNull(),
+	label: varchar("label", { length: 255 }),
+	type: fieldTypeEnum("field_type").notNull(),
+	required: boolean("required").default(false),
+	order: integer("order").notNull(),
+});
+
+export const fieldsRelations = relations(fields, ({ one }) => ({
+	form: one(forms, { fields: [fields.formId], references: [forms.id] }),
+}));
+
+export const fieldOptions = createTable("field_options", {
+	id: varchar("id", { length: 255 })
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	fieldId: varchar("field_id", { length: 255 })
+		.notNull()
+		.references(() => fields.id, {
+			onDelete: "cascade",
+		}),
+	value: varchar("value", { length: 255 }).notNull(),
+	label: varchar("label", { length: 255 }).notNull(),
+	order: integer("order").notNull().notNull(),
+});
+
+export const fieldOptionsRelations = relations(fieldOptions, ({ one }) => ({
+	field: one(fields, {
+		fields: [fieldOptions.fieldId],
+		references: [fields.id],
+	}),
+}));
+
+export const responses = createTable("responses", {
+	id: varchar("id", { length: 255 })
+		.notNull()
+		.primaryKey()
+		.$defaultFn(() => crypto.randomUUID()),
+	formId: varchar("form_id", { length: 255 })
+		.notNull()
+		.references(() => forms.id),
+	ownerId: varchar("owner_id", { length: 255 })
+		.notNull()
+		.references(() => users.id),
+	createdAt: timestamp("created_at", {
+		mode: "date",
+		withTimezone: true,
+	}).default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const responsesRelations = relations(responses, ({ one }) => ({
+	form: one(forms, { fields: [responses.formId], references: [forms.id] }),
+	owner: one(users, { fields: [responses.ownerId], references: [users.id] }),
+}));
+
+export const responseValues = createTable(
+	"response_values",
+	{
+		id: varchar("id", { length: 255 })
+			.notNull()
+			.primaryKey()
+			.$defaultFn(() => crypto.randomUUID()),
+		responseId: varchar("response_id", { length: 255 })
+			.notNull()
+			.references(() => responses.id, {
+				onDelete: "cascade",
+			}),
+		fieldId: varchar("field_id", { length: 255 })
+			.notNull()
+			.references(() => fields.id, {
+				onDelete: "cascade",
+			}),
+		fieldOptionId: varchar("field_option_id", { length: 255 }).references(
+			() => fieldOptions.id,
+			{
+				onDelete: "cascade",
+			},
+		),
+		value: text("value"),
+	},
+	(table): PgTableExtraConfig => {
+		return {
+			checkOptionOrValue: check(
+				"check_option_or_value",
+				sql`
+      (${table.fieldOptionId} IS NOT NULL AND ${table.value} IS NULL) OR
+      (${table.fieldOptionId} IS NULL AND ${table.value} IS NOT NULL)
+    `,
+			),
+		};
+	},
+);
+
+export const responseValuesRelations = relations(responseValues, ({ one }) => ({
+	response: one(responses, {
+		fields: [responseValues.responseId],
+		references: [responses.id],
+	}),
+	field: one(fields, {
+		fields: [responseValues.fieldId],
+		references: [fields.id],
+	}),
+	fieldOption: one(fieldOptions, {
+		fields: [responseValues.fieldOptionId],
+		references: [fieldOptions.id],
+	}),
+}));
