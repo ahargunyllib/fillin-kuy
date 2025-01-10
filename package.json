@@ -8,6 +8,8 @@
 		"db:migrate": "drizzle-kit migrate",
 		"db:push": "drizzle-kit push",
 		"db:studio": "drizzle-kit studio",
+		"db:up": "drizzle-kit up",
+		"db:drop": "drizzle-kit drop",
 		"dev": "next dev --turbo",
 		"start": "next start",
 		"lint": "next lint",
