@@ -3,6 +3,7 @@ import {
 	createTRPCRouter,
 	publicProcedure,
 } from "@/server/api/trpc";
+import { formRouter } from "./routers/form";
 
 /**
  * This is the primary router for your server.
@@ -14,6 +15,7 @@ export const appRouter = createTRPCRouter({
 	hi: publicProcedure.query(() => {
 		return "Hello, world!";
 	}),
+	forms: formRouter,
 });
 
 // export type definition of API
