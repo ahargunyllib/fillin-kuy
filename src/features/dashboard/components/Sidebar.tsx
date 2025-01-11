@@ -8,14 +8,14 @@ import {
 	FrameIcon,
 	GalleryVerticalEndIcon,
 	MapIcon,
+	NotepadTextIcon,
 	PieChartIcon,
 	Settings2Icon,
 	SquareTerminalIcon,
 } from "lucide-react";
 import type * as React from "react";
 
-import { NavMain } from "@/features/dashboard/components/MainNav";
-import { NavProjects } from "@/features/dashboard/components/ProjectNav";
+import { NavSecondary } from "@/features/dashboard/components/SecNav";
 import { TeamSwitcher } from "@/features/dashboard/components/TeamSwticher";
 import { NavUser } from "@/features/dashboard/components/UserNav";
 import {
@@ -25,6 +25,8 @@ import {
 	SidebarHeader,
 	SidebarRail,
 } from "@/shared/components/ui/sidebar";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // This is sample data.
 const data = {
@@ -137,41 +139,32 @@ const data = {
 			],
 		},
 	],
-	projects: [
+	features: [
 		{
-			name: "Design Engineering",
-			url: "#",
-			icon: FrameIcon,
-		},
-		{
-			name: "Sales & Marketing",
-			url: "#",
-			icon: PieChartIcon,
-		},
-		{
-			name: "Travel",
-			url: "#",
-			icon: MapIcon,
+			name: "Forms",
+			url: "/dashboard/forms",
+			icon: NotepadTextIcon,
 		},
 	],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+	const { status } = useSession();
+	const router = useRouter();
+
+	if (status === "unauthenticated") {
+		router.replace("/api/auth/signin");
+		return null;
+	}
+
 	return (
 		<Sidebar collapsible="icon" {...props}>
 			<SidebarHeader>
 				<TeamSwitcher teams={data.teams} />
-				{/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-					<GalleryHorizontalEndIcon className="size-4" />
-				</div>
-				<div className="grid flex-1 text-left text-sm leading-tight">
-					<span className="truncate font-semibold">Acme Inc</span>
-					<span className="truncate text-xs">Enterprise</span>
-				</div> */}
 			</SidebarHeader>
 			<SidebarContent>
-				<NavMain items={data.navMain} />
-				<NavProjects projects={data.projects} />
+				{/* <NavMain label="Form" items={data.navMain} /> */}
+				<NavSecondary label="Features" items={data.features} />
 			</SidebarContent>
 			<SidebarFooter>
 				<NavUser user={data.user} />

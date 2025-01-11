@@ -25,10 +25,12 @@ import {
 	useSidebar,
 } from "@/shared/components/ui/sidebar";
 
-export function NavProjects({
-	projects,
+export function NavSecondary({
+	label,
+	items,
 }: {
-	projects: {
+	label: string;
+	items: {
 		name: string;
 		url: string;
 		icon: LucideIcon;
@@ -38,9 +40,9 @@ export function NavProjects({
 
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
-			<SidebarGroupLabel>Projects</SidebarGroupLabel>
+			<SidebarGroupLabel>{label}</SidebarGroupLabel>
 			<SidebarMenu>
-				{projects.map((item) => (
+				{items.map((item) => (
 					<SidebarMenuItem key={item.name}>
 						<SidebarMenuButton asChild>
 							<a href={item.url}>
@@ -48,7 +50,7 @@ export function NavProjects({
 								<span>{item.name}</span>
 							</a>
 						</SidebarMenuButton>
-						<DropdownMenu>
+						{/* <DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<SidebarMenuAction showOnHover>
 									<MoreHorizontal />
@@ -74,15 +76,15 @@ export function NavProjects({
 									<span>Delete Project</span>
 								</DropdownMenuItem>
 							</DropdownMenuContent>
-						</DropdownMenu>
+						</DropdownMenu> */}
 					</SidebarMenuItem>
 				))}
-				<SidebarMenuItem>
+				{/* <SidebarMenuItem>
 					<SidebarMenuButton className="text-sidebar-foreground/70">
 						<MoreHorizontal className="text-sidebar-foreground/70" />
 						<span>More</span>
 					</SidebarMenuButton>
-				</SidebarMenuItem>
+				</SidebarMenuItem> */}
 			</SidebarMenu>
 		</SidebarGroup>
 	);
