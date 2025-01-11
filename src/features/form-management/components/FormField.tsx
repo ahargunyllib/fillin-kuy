@@ -74,11 +74,12 @@ export default function FormField({
 								"w-[604px] p-4 border rounded-lg flex flex-row items-start gap-2 cursor-pointer",
 								activeFieldId === field.id && "border-ring",
 							)}
-							onClick={() =>
+							onClick={(e) => {
+								e.stopPropagation();
 								setActiveFieldId((prevId) =>
 									prevId === field.id ? null : field.id,
-								)
-							}
+								);
+							}}
 						>
 							<div className="w-1/2 flex flex-col gap-2">
 								<Input
@@ -220,7 +221,8 @@ export default function FormField({
 													<Button
 														variant="destructive"
 														size="icon"
-														onClick={() => {
+														onClick={(e) => {
+															e.stopPropagation();
 															setFields((prevFields) =>
 																prevFields.map((f) =>
 																	f.id === field.id
@@ -251,7 +253,8 @@ export default function FormField({
 												</div>
 											))}
 											<Label
-												onClick={(e) =>
+												onClick={(e) => {
+													e.stopPropagation();
 													setFields((prevFields) =>
 														prevFields.map((f) =>
 															f.id === field.id
@@ -272,8 +275,8 @@ export default function FormField({
 																	}
 																: f,
 														),
-													)
-												}
+													);
+												}}
 												className={cn(
 													"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 opacity-50",
 													"p-0 mb-0 bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none cursor-pointer",
@@ -444,7 +447,8 @@ export default function FormField({
 				<Button
 					className="w-full"
 					variant="secondary"
-					onClick={() => {
+					onClick={(e) => {
+						e.stopPropagation();
 						setFields([
 							...fields,
 							{
