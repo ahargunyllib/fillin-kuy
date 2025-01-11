@@ -112,7 +112,7 @@ export default function FormField({
 									onChange={(e) =>
 										setFields((prevFields) =>
 											prevFields.map((f) =>
-												f.description === field.description
+												f.id === field.id
 													? {
 															...f,
 															description:
