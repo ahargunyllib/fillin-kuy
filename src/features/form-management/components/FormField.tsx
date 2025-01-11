@@ -89,7 +89,6 @@ export default function FormField({
 								<Input
 									type="text"
 									value={field.label}
-									autoFocus
 									onChange={(e) =>
 										setFields((prevFields) =>
 											prevFields.map((f) =>
@@ -113,7 +112,6 @@ export default function FormField({
 								<Input
 									type="text"
 									value={field.description || "Add description"}
-									autoFocus
 									onChange={(e) =>
 										setFields((prevFields) =>
 											prevFields.map((f) =>
@@ -190,7 +188,6 @@ export default function FormField({
 													<Input
 														type="text"
 														value={option.label}
-														autoFocus
 														onChange={(e) =>
 															setFields((prevFields) =>
 																prevFields.map((f) =>
@@ -393,12 +390,58 @@ export default function FormField({
 								<div className="flex flex-row items-center justify-end gap-2 h-full">
 									<div className="flex items-center justify-end space-x-2">
 										<Label htmlFor="required">Required</Label>
-										<Switch id="required" />
+										<Switch
+											id="required"
+											checked={field.required}
+											onClick={(e) => e.stopPropagation()}
+											onCheckedChange={(check) => {
+												setFields((prevFields) =>
+													prevFields.map((f) =>
+														f.id === field.id
+															? {
+																	...f,
+																	required: check,
+																}
+															: f,
+													),
+												);
+											}}
+										/>
 									</div>
-									<Button variant="outline" size="icon">
+									<Button
+										aria-label="Duplicate field"
+										variant="outline"
+										size="icon"
+										onClick={(e) => {
+											e.stopPropagation();
+											setFields((prevFields) => {
+												const index = prevFields.findIndex(
+													(f) => f.id === field.id,
+												);
+												const newField = {
+													...field,
+													id: Math.random().toString(36).substring(7),
+												};
+												return prevFields
+													.slice(0, index + 1)
+													.concat(newField)
+													.concat(prevFields.slice(index + 1));
+											});
+										}}
+									>
 										<CopyIcon />
 									</Button>
-									<Button variant="destructive" size="icon">
+									<Button
+										aria-label="Delete field"
+										variant="destructive"
+										size="icon"
+										onClick={(e) => {
+											e.stopPropagation();
+											setFields((prevFields) =>
+												prevFields.filter((f) => f.id !== field.id),
+											);
+										}}
+									>
 										<Trash2Icon />
 									</Button>
 								</div>
