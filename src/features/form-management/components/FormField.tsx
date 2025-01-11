@@ -54,7 +54,11 @@ export default function FormField({
 	const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
 
 	return (
-		<section className="w-full flex flex-col items-center gap-4">
+		// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+		<section
+			className="w-full flex flex-col items-center gap-4"
+			onClick={() => setActiveFieldId(null)}
+		>
 			<div className="w-[604px] p-4 border rounded-lg flex flex-col gap-4">
 				<h1>Title</h1>
 				<p>
