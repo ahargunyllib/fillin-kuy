@@ -124,11 +124,15 @@ export const forms = createTable("forms", {
 	createdAt: timestamp("created_at", {
 		mode: "date",
 		withTimezone: true,
-	}).default(sql`CURRENT_TIMESTAMP`),
+	})
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
 	updatedAt: timestamp("updated_at", {
 		mode: "date",
 		withTimezone: true,
-	}).default(sql`CURRENT_TIMESTAMP`),
+	})
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
 	closedAt: timestamp("closed_at", {
 		mode: "date",
 		withTimezone: true,
@@ -164,10 +168,10 @@ export const fields = createTable("fields", {
 		.references(() => forms.id, {
 			onDelete: "cascade",
 		}),
-	name: varchar("name", { length: 255 }).notNull(),
-	label: varchar("label", { length: 255 }),
+	description: varchar("description", { length: 255 }),
+	label: varchar("label", { length: 255 }).notNull(),
 	type: fieldTypeEnum("field_type").notNull(),
-	required: boolean("required").default(false),
+	required: boolean("required").default(false).notNull(),
 	order: integer("order").notNull(),
 });
 
@@ -187,7 +191,6 @@ export const fieldOptions = createTable("field_options", {
 		}),
 	value: varchar("value", { length: 255 }).notNull(),
 	label: varchar("label", { length: 255 }).notNull(),
-	order: integer("order").notNull().notNull(),
 });
 
 export const fieldOptionsRelations = relations(fieldOptions, ({ one }) => ({
