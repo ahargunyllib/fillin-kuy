@@ -30,6 +30,7 @@ import {
 	Trash2Icon,
 	XIcon,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useState } from "react";
 
 export default function FormField({
@@ -66,9 +67,11 @@ export default function FormField({
 					malesuada, libero vel ultricies posuere.
 				</p>
 			</div>
-			<div className="flex flex-col gap-4">
+			<motion.div layout className="flex flex-col gap-4">
 				{fields.map((field) => (
-					<div
+					<motion.div
+						layout
+						transition={{ type: "tween", ease: ["easeInOut", "easeInOut"] }}
 						key={field.id}
 						className="relative flex flex-row justify-center items-center"
 					>
@@ -487,9 +490,9 @@ export default function FormField({
 								</Button>
 							</div>
 						)}
-					</div>
+					</motion.div>
 				))}
-			</div>
+			</motion.div>
 			<div className="w-[604px] p-4 border rounded-lg flex flex-row gap-4">
 				<Button
 					className="w-full"
